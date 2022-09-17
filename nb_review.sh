@@ -5,7 +5,7 @@ HISTORY_FILE="/home/gsd/Code/Bash/nb_history"
 SCRIPT_FILE="/home/gsd/Code/Bash/review-nb/nb_review.sh"
 shopt -s extglob
 FILE=$(ls $SRC/!(*bookmark*).md | shuf -n 1)
-while grep -q $FILE "$HISTORY_FILE"; do
+while grep -q "$FILE" "$HISTORY_FILE"; do
   FILE=$(ls $SRC/!(*bookmark*).md | shuf -n 1)
 done
 # echo "Loading file $FILE...."
@@ -13,9 +13,9 @@ done
 FILENAME=$(basename ${FILE})
 WORDS=$(wc -w "$FILE" | cut -d ' ' -f1)
 PARTS=0
-HEADERS=$(cat "$FILE" | grep  -Pe'## ' | wc -l)
+HEADERS=$(grep  -Pec '## ' <  "$FILE")
 echo "number of words : $WORDS  / number of titles : $HEADERS"
-IN=$(cat "$FILE" | sed  "s/[_>*\\]//")
+IN=$(  sed  "s/[_>*\\]//"" < $FILE")
 while [[ $WORDS -gt 200 ]]; do
   echo "Part $PARTS spliting to $WORDS words"
   WORDS=$((WORDS / 2))
@@ -24,23 +24,23 @@ done
 if [[ $PARTS -gt 2 ]];then
 
   echo "Note $FILENAME should be review for atomistic issue..."
-  read
+  read -r
 fi
 echo "parts : $PARTS // words : $WORDS"
 if [[ $PARTS -eq 0 ]]; then
   TEXT=$IN
 else
-INDEX=$((  ($RANDOM%$PARTS)  ))
+INDEX=$((  (RANDOM%PARTS)  ))
 INDEX=0
-PART1=$(( $WORDS * $INDEX ))
-PART2=$(( $WORDS * ($INDEX + 1) ))
+PART1=$(( WORDS * INDEX ))
+PART2=$(( WORDS * (INDEX + 1) ))
 echo "Part $INDEX is used with index from $PART1 to $PART2"
 TEXT=$(echo "$IN" | choose -f ' ' $PART1:$PART2)
 fi
-tt -raw -notheme -bold <<< $TEXT
-echo "$(tail -n +2 $HISTORY_FILE)" > $HISTORY_FILE
+tt -raw -notheme -bold <<< "$TEXT"
+tail -n +2 "$HISTORY_FILE" > $HISTORY_FILE
 # Avoid to use temp file
 echo "$FILE" >> $HISTORY_FILE
 shopt -u extglob
-read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+read -rp "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 bash -c "$SCRIPT_FILE"
