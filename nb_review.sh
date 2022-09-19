@@ -13,9 +13,9 @@ done
 FILENAME=$(basename ${FILE})
 WORDS=$(wc -w "$FILE" | cut -d ' ' -f1)
 PARTS=0
-HEADERS=$(grep  -Pec '## ' <  "$FILE")
+HEADERS=$(cat "$FILE" | grep  -Pec '## ')
 echo "number of words : $WORDS  / number of titles : $HEADERS"
-IN=$(  sed  "s/[_>*\\]//"" < $FILE")
+IN=$(  sed  "s/[_>*\\]//" < "$FILE")
 while [[ $WORDS -gt 200 ]]; do
   echo "Part $PARTS spliting to $WORDS words"
   WORDS=$((WORDS / 2))
@@ -31,7 +31,6 @@ if [[ $PARTS -eq 0 ]]; then
   TEXT=$IN
 else
 INDEX=$((  (RANDOM%PARTS)  ))
-INDEX=0
 PART1=$(( WORDS * INDEX ))
 PART2=$(( WORDS * (INDEX + 1) ))
 echo "Part $INDEX is used with index from $PART1 to $PART2"
