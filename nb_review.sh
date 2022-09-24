@@ -36,7 +36,7 @@ PART2=$(( WORDS * (INDEX + 1) ))
 echo "Part $INDEX is used with index from $PART1 to $PART2"
 TEXT=$(echo "$IN" | choose -f ' ' $PART1:$PART2)
 fi
-tt -raw -notheme -bold <<< "$TEXT"
+tt -raw -theme nord-light -bold -oneshot -noreport <<< "$TEXT"
 tail -n +2 "$HISTORY_FILE" > $HISTORY_FILE
 # Avoid to use temp file
 echo "$FILE" >> $HISTORY_FILE
